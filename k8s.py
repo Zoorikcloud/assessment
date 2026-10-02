@@ -8,11 +8,11 @@ Paste this line in Azure Cloud Shell (every AKS cluster in the current
 subscription), in AWS CloudShell (every EKS cluster in every enabled region),
 or in any other shell, where it uses az or aws if signed in, else the current
 kubectl context:
-    curl -fsSL https://zoorik.com/assessments/k8s | python3 -
+    curl -fsSL https://zoorik.com/assess/k8s | python3 -
 
 Options go after the dash. --context NAME assesses only that context:
-    curl -fsSL https://zoorik.com/assessments/k8s | python3 - --anonymize
-    curl -fsSL https://zoorik.com/assessments/k8s | python3 - --context prod --sample-minutes 10
+    curl -fsSL https://zoorik.com/assess/k8s | python3 - --anonymize
+    curl -fsSL https://zoorik.com/assess/k8s | python3 - --context prod --sample-minutes 10
 
 The source is at github.com/Zoorikcloud/assessment.
 
@@ -73,7 +73,7 @@ from xml.sax.saxutils import escape
 # ---------------------------------------------------------------- config
 
 VERSION = "1.0.0"
-ONE_LINER = "curl -fsSL https://zoorik.com/assessments/k8s | python3 -"
+ONE_LINER = "curl -fsSL https://zoorik.com/assess/k8s | python3 -"
 SEND_TO = "founders@zoorik.com"
 
 HOURS_PER_MONTH = 730

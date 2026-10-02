@@ -6,14 +6,14 @@ Zoorik's free assessments for k8spilot (Kubernetes) and ElasticVol (Azure block 
 - [Azure disks: `disks.py`](#azure-disks-diskspy) covers the data disks of your Azure Linux VMs.
 - [Where the figures come from](#where-the-figures-come-from)
 
-Each script is one Python file. It needs Python 3.8 or later and uses only the standard library. Azure Cloud Shell and AWS CloudShell already have Python 3 and the CLIs the scripts call. Each `zoorik.com/assessments/...` URL redirects to the file of the same name in this repo, so the code you read here is the code that runs.
+Each script is one Python file. It needs Python 3.8 or later and uses only the standard library. Azure Cloud Shell and AWS CloudShell already have Python 3 and the CLIs the scripts call. Each `zoorik.com/assess/...` URL redirects to the file of the same name in this repo, so the code you read here is the code that runs.
 
 ---
 
 ## Kubernetes: k8s.py
 
 ```bash
-curl -fsSL https://zoorik.com/assessments/k8s | python3 -
+curl -fsSL https://zoorik.com/assess/k8s | python3 -
 ```
 
 ### Where to run it
@@ -113,7 +113,7 @@ When the script can't read a cluster, the run goes on to the next one, and the S
 Put options after the dash:
 
 ```bash
-curl -fsSL https://zoorik.com/assessments/k8s | python3 - --anonymize
+curl -fsSL https://zoorik.com/assess/k8s | python3 - --anonymize
 ```
 
 | Option | Effect |
@@ -188,7 +188,7 @@ They leave out discounts, reservations, savings plans and credits. Nodes whose l
 ## Azure disks: disks.py
 
 ```bash
-curl -fsSL https://zoorik.com/assessments/disks | python3 -
+curl -fsSL https://zoorik.com/assess/disks | python3 -
 ```
 
 ### Where to run it
