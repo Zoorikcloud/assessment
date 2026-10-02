@@ -2,18 +2,18 @@
 
 Zoorik's free assessments for k8spilot (Kubernetes) and ElasticVol (Azure block storage). You paste one line. The script writes one Excel file that estimates what you could save, and you e-mail that file to founders@zoorik.com.
 
-- [Kubernetes: `k8s.py`](#kubernetes-k8spy) covers AKS, EKS, or any cluster kubectl can reach.
-- [Azure disks: `disks.py`](#azure-disks-diskspy) covers the data disks of your Azure Linux VMs.
+- [Kubernetes: `coral.py`](#kubernetes-coralpy) covers AKS, EKS, or any cluster kubectl can reach.
+- [Azure disks: `amoeba.py`](#azure-disks-amoebapy) covers the data disks of your Azure Linux VMs.
 - [Where the figures come from](#where-the-figures-come-from)
 
 Each script is one Python file. It needs Python 3.8 or later and uses only the standard library. Azure Cloud Shell and AWS CloudShell already have Python 3 and the CLIs the scripts call. Each `zoorik.com/assess/...` URL redirects to the file of the same name in this repo, so the code you read here is the code that runs.
 
 ---
 
-## Kubernetes: k8s.py
+## Kubernetes: coral.py
 
 ```bash
-curl -fsSL https://zoorik.com/assess/k8s | python3 -
+curl -fsSL https://zoorik.com/assess/coral | python3 -
 ```
 
 ### Where to run it
@@ -113,7 +113,7 @@ When the script can't read a cluster, the run goes on to the next one, and the S
 Put options after the dash:
 
 ```bash
-curl -fsSL https://zoorik.com/assess/k8s | python3 - --anonymize
+curl -fsSL https://zoorik.com/assess/coral | python3 - --anonymize
 ```
 
 | Option | Effect |
@@ -185,10 +185,10 @@ They leave out discounts, reservations, savings plans and credits. Nodes whose l
 
 ---
 
-## Azure disks: disks.py
+## Azure disks: amoeba.py
 
 ```bash
-curl -fsSL https://zoorik.com/assess/disks | python3 -
+curl -fsSL https://zoorik.com/assess/amoeba | python3 -
 ```
 
 ### Where to run it
@@ -334,7 +334,7 @@ Every figure in either file is one of these:
 - read from the public price lists;
 - computed from those by the method above.
 
-When a figure can't be known, its cell is blank and the row says why. In the k8s.py report, see the Status and Price note columns; a blank limit there means at least one container has no limit. In the disks.py report, see the Reason and Note columns. Nothing is guessed or filled in.
+When a figure can't be known, its cell is blank and the row says why. In the coral.py report, see the Status and Price note columns; a blank limit there means at least one container has no limit. In the amoeba.py report, see the Reason and Note columns. Nothing is guessed or filled in.
 
 The figures are estimates at list prices, not a quote.
 

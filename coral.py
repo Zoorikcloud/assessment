@@ -8,11 +8,11 @@ Paste this line in Azure Cloud Shell (every AKS cluster in the current
 subscription), in AWS CloudShell (every EKS cluster in every enabled region),
 or in any other shell, where it uses az or aws if signed in, else the current
 kubectl context:
-    curl -fsSL https://zoorik.com/assess/k8s | python3 -
+    curl -fsSL https://zoorik.com/assess/coral | python3 -
 
 Options go after the dash. --context NAME assesses only that context:
-    curl -fsSL https://zoorik.com/assess/k8s | python3 - --anonymize
-    curl -fsSL https://zoorik.com/assess/k8s | python3 - --context prod --sample-minutes 10
+    curl -fsSL https://zoorik.com/assess/coral | python3 - --anonymize
+    curl -fsSL https://zoorik.com/assess/coral | python3 - --context prod --sample-minutes 10
 
 The source is at github.com/Zoorikcloud/assessment.
 
@@ -73,7 +73,7 @@ from xml.sax.saxutils import escape
 # ---------------------------------------------------------------- config
 
 VERSION = "1.0.0"
-ONE_LINER = "curl -fsSL https://zoorik.com/assess/k8s | python3 -"
+ONE_LINER = "curl -fsSL https://zoorik.com/assess/coral | python3 -"
 SEND_TO = "founders@zoorik.com"
 
 HOURS_PER_MONTH = 730
@@ -1670,7 +1670,7 @@ def write_xlsx(path: str, sheets: list) -> None:
 # ---------------------------------------------------------------- main
 
 def parse_args(argv: Optional[list]) -> argparse.Namespace:
-    p = argparse.ArgumentParser(prog="k8s.py", usage=f"{ONE_LINER} [options]",
+    p = argparse.ArgumentParser(prog="coral.py", usage=f"{ONE_LINER} [options]",
                                 description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--context", action="append", metavar="NAME", help="assess this kube context (repeatable)")
     p.add_argument("--all-contexts", action="store_true", help="assess every context in your kubeconfig")
