@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Zoorik ElasticVol disk assessment.
+"""Zoorik Amoeba: disk assessment.
 
 Reads the Azure VMs and managed disks you can see, estimates what Zoorik
-ElasticVol (Zoorik block storage) could save by right-sizing the data disks of
+Amoeba (Zoorik block storage) could save by right-sizing the data disks of
 your Linux VMs, and writes one Excel file for you to e-mail to Zoorik.
 Nothing to install.
 
 Run it in Azure Cloud Shell, or in any shell where az is signed in:
-    curl -fsSL https://zoorik.com/assess/amoeba | python3 -
+    curl -fsSL https://zoorik.com/assess/disks | python3 -
 
 The source is at github.com/Zoorikcloud/assessment.
 
@@ -56,7 +56,7 @@ from xml.sax.saxutils import escape
 # ---------------------------------------------------------------- config
 
 VERSION = "1.0.0"
-ONE_LINER = "curl -fsSL https://zoorik.com/assess/amoeba | python3 -"
+ONE_LINER = "curl -fsSL https://zoorik.com/assess/disks | python3 -"
 SEND_TO = "founders@zoorik.com"
 
 HOURS_PER_MONTH = 730
@@ -73,7 +73,7 @@ METRICS_API = "2023-10-01"
 METRICS = ("Composite Disk Read Operations/sec", "Composite Disk Write Operations/sec",
            "Composite Disk Read Bytes/sec", "Composite Disk Write Bytes/sec")
 
-# How Zoorik ElasticVol sizes a pool: the same rules and numbers the product plans with.
+# How Zoorik Amoeba sizes a pool: the same rules and numbers the product plans with.
 HEADROOM_FRACTION = 0.20
 HEADROOM_MIN_GIB = 50
 ANCHOR_POOL_THRESHOLD_GIB = 512
@@ -807,7 +807,7 @@ def os_label(vm: Vm) -> str:
     return vm.os_type.capitalize()
 
 
-# ---------------------------------------------------------------- pool sizing (as Zoorik ElasticVol plans it)
+# ---------------------------------------------------------------- pool sizing (as Zoorik Amoeba plans it)
 
 def ceil_div(numerator: int, divisor: int) -> int:
     return numerator if divisor <= 0 else -(-numerator // divisor)
@@ -925,15 +925,15 @@ def member_mbps(demand: float, members: int, iops: int, vm_mbps: int) -> int:
 # ---------------------------------------------------------------- assessment
 
 def screen(vm: Vm) -> List[str]:
-    """Reasons ElasticVol cannot take the VM, from what Azure reports (before looking inside it)."""
+    """Reasons Amoeba cannot take the VM, from what Azure reports (before looking inside it)."""
     red = []
     if not vm.linux:
-        red.append(f"{vm.os_type or 'Non-Linux'} VM; ElasticVol supports Linux")
+        red.append(f"{vm.os_type or 'Non-Linux'} VM; Amoeba supports Linux")
     if vm.managed_by:
-        red.append(f"in a resource group managed by {vm.managed_by}; ElasticVol does not take VMs another Azure "
+        red.append(f"in a resource group managed by {vm.managed_by}; Amoeba does not take VMs another Azure "
                    "service runs")
     if vm.slots is not None and vm.slots < MIN_VM_SLOTS:
-        red.append(f"{vm.size} has {vm.slots} data-disk slots; ElasticVol needs {MIN_VM_SLOTS} or more")
+        red.append(f"{vm.size} has {vm.slots} data-disk slots; Amoeba needs {MIN_VM_SLOTS} or more")
     if vm.linux and rhel_family(vm):
         red.append("RHEL-family Linux; its stock kernel has no btrfs")
     return red
@@ -1018,7 +1018,7 @@ def assess(vm: Vm, prices: Dict[str, Optional[Prices]]) -> None:
         if version and version < KERNEL_FLOOR:
             amber.append(f"kernel {g.kernel} is below 5.14; upgrade the kernel first (Ubuntu 20.04: the HWE kernel)")
         if not mounts:
-            red.append("its mounted data disks are shared disks, which ElasticVol does not pool" if on_data
+            red.append("its mounted data disks are shared disks, which Amoeba does not pool" if on_data
                        else "no mounted data disk found inside the VM")
     if any(dd.disk and dd.disk.ade for dd in vm.data):
         amber.append("Azure Disk Encryption is on; move to server-side encryption first")
@@ -1041,7 +1041,7 @@ def assess(vm: Vm, prices: Dict[str, Optional[Prices]]) -> None:
         notes.append(f"df did not report {missing[0]}")
     if g and mounts:
         if shared:
-            notes.append(f"{len(shared)} shared disk(s) stay as they are; ElasticVol does not pool a shared disk")
+            notes.append(f"{len(shared)} shared disk(s) stay as they are; Amoeba does not pool a shared disk")
         left = len([dd for dd in vm.data if dd.lun not in pooled and dd.lun not in shared])
         if left:
             notes.append(f"{left} data disk(s) without a mounted file system stay as they are")
@@ -1152,7 +1152,7 @@ UNATTACHED_COLS = [("Subscription", "text"), ("Resource group", "text"), ("Disk"
 
 
 def pool_disks(vm: Vm) -> str:
-    """The disk type the VM's pool would use; blank where ElasticVol cannot take the VM or it is not known."""
+    """The disk type the VM's pool would use; blank where Amoeba cannot take the VM or it is not known."""
     if not vm.linux or vm.lane in ("", "Not supported") or vm.pool_v2 is None:
         return ""
     return POOL_V2 if vm.pool_v2 else POOL_V1
@@ -1265,7 +1265,7 @@ def summary_rows(run: dict, vms: List[Vm], disks: List[Disk]) -> Tuple[list, set
     if unpriced:
         item("Data disks not priced", f"{unpriced} (see the Reason column on the VMs sheet)")
 
-    section("Zoorik ElasticVol")
+    section("Zoorik Amoeba")
     if total_saving is None:
         item("Estimated saving, $/mo", no_saving_text(vms))
     else:
@@ -1287,7 +1287,7 @@ def summary_rows(run: dict, vms: List[Vm], disks: List[Disk]) -> Tuple[list, set
     for note, count in sorted(why_not.items(), key=lambda kv: -kv[1]):
         item(f"Not read: {note}", count, "int")
 
-    section("Unattached disks (not part of the ElasticVol saving)")
+    section("Unattached disks (not part of the Amoeba saving)")
     loose = [d for d in disks if d.state.lower() == "unattached"]
     loose_spend = [d.price for d in loose if d.price is not None]
     item("Unattached disks", len(loose), "int")
@@ -1307,9 +1307,9 @@ def about_rows(ran_in: int, guest_answer: str) -> list:
     rows = [
         ("What this is", "An estimate, not a quote. The figures come from your Azure and from public list prices "
                          "at the time of the run."),
-        ("The saving", "For each Linux VM: used space is read inside the VM (df). Zoorik ElasticVol moves the "
+        ("The saving", "For each Linux VM: used space is read inside the VM (df). Zoorik Amoeba moves the "
                        "VM's data mounts onto one btrfs pool sized to the data: pool size "
-                       f"= used + 20% (at least {HEADROOM_MIN_GIB} GB), rounded up, laid out as ElasticVol plans "
+                       f"= used + 20% (at least {HEADROOM_MIN_GIB} GB), rounded up, laid out as Amoeba plans "
                        "it (2 anchor disks and 3 to 6 equal elastic disks; on VMs with few free data-disk slots, "
                        "1 anchor and up to 3 elastics). A Premium SSD v2 pool adds one 8 GB disk. In a Premium SSD "
                        f"pool every disk is a Premium SSD size and elastics are at least {ELASTIC_FLOOR_V1_GIB} GB. "
@@ -1333,7 +1333,7 @@ def about_rows(ran_in: int, guest_answer: str) -> list:
         ("Not included", "Negotiated discounts, reservations, savings plans and credits; transaction charges, "
                          "bursting and snapshots; OS disks; unmanaged (VHD) disks; scale-set (uniform) instances; "
                          "subscriptions in other Azure directories."),
-        ("Lanes", "Ready: ElasticVol can take the VM as it is. Needs work: a fix first (kernel 5.14 or later, "
+        ("Lanes", "Ready: Amoeba can take the VM as it is. Needs work: a fix first (kernel 5.14 or later, "
                   "Azure Disk Encryption, free data-disk slots). Not supported: Windows; VMs in a resource group "
                   "another Azure service manages (such as Azure Databricks or an AKS node resource group); VM sizes "
                   f"with fewer than {MIN_VM_SLOTS} data-disk slots; RHEL-family Linux; no btrfs in the kernel; no "
@@ -1358,7 +1358,7 @@ def about_rows(ran_in: int, guest_answer: str) -> list:
         rows.append(("What ran", f"Read calls only: {reads}. Nothing in your Azure was changed, and nothing was "
                                  "sent anywhere."))
         rows.append(("Inside the VMs", f"Nothing ran inside any VM ({guest_answer})."))
-    rows.append(("Prepared by", f"Zoorik ElasticVol disk assessment {VERSION}. Run it again: {ONE_LINER}  "
+    rows.append(("Prepared by", f"Zoorik Amoeba: disk assessment {VERSION}. Run it again: {ONE_LINER}  "
                                 f"Questions: {SEND_TO}"))
     return [list(r) for r in rows]
 
@@ -1370,7 +1370,7 @@ def build_sheets(run: dict, vms: List[Vm], disks: List[Disk]) -> list:
     loose, loose_total = unattached_rows(disks, names, run["now"])
     return [
         Sheet("Summary", [("Item", "text"), ("Value", "text")], summary, bold_rows=bold, widths=[44, 90],
-              autofilter=False, preamble=[("Zoorik ElasticVol disk assessment", "title"), ("", "")]),
+              autofilter=False, preamble=[("Zoorik Amoeba: disk assessment", "title"), ("", "")]),
         Sheet("VMs", VM_COLS, vm_list, total=vm_total),
         Sheet("Disks", DISK_COLS, disk_rows(vms)),
         Sheet("Unattached disks", UNATTACHED_COLS, loose, total=loose_total),
@@ -1632,7 +1632,7 @@ def unused_path(folder: str, stem: str) -> str:
 
 
 def assessment() -> int:
-    say(f"Zoorik ElasticVol disk assessment {VERSION}")
+    say(f"Zoorik Amoeba: disk assessment {VERSION}")
     if os.name == "nt":
         say("On Windows, run this in Azure Cloud Shell (shell.azure.com) or in WSL.")
         return 1

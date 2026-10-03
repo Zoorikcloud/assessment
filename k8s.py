@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Zoorik Kubernetes cost assessment.
+"""Zoorik Coral: Kubernetes cost assessment.
 
 Reads your AKS and EKS clusters, estimates what right-sizing could save, and
 writes one Excel file for you to e-mail to Zoorik. Nothing to install.
@@ -8,11 +8,11 @@ Paste this line in Azure Cloud Shell (every AKS cluster in the current
 subscription), in AWS CloudShell (every EKS cluster in every enabled region),
 or in any other shell, where it uses az or aws if signed in, else the current
 kubectl context:
-    curl -fsSL https://zoorik.com/assess/coral | python3 -
+    curl -fsSL https://zoorik.com/assess/k8s | python3 -
 
 Options go after the dash. --context NAME assesses only that context:
-    curl -fsSL https://zoorik.com/assess/coral | python3 - --anonymize
-    curl -fsSL https://zoorik.com/assess/coral | python3 - --context prod --sample-minutes 10
+    curl -fsSL https://zoorik.com/assess/k8s | python3 - --anonymize
+    curl -fsSL https://zoorik.com/assess/k8s | python3 - --context prod --sample-minutes 10
 
 The source is at github.com/Zoorikcloud/assessment.
 
@@ -73,7 +73,7 @@ from xml.sax.saxutils import escape
 # ---------------------------------------------------------------- config
 
 VERSION = "1.0.0"
-ONE_LINER = "curl -fsSL https://zoorik.com/assess/coral | python3 -"
+ONE_LINER = "curl -fsSL https://zoorik.com/assess/k8s | python3 -"
 SEND_TO = "founders@zoorik.com"
 
 HOURS_PER_MONTH = 730
@@ -1471,7 +1471,7 @@ def assumptions(minutes: float, anonymized: bool) -> list:
         ("Usage", "Peak of kubectl top (metrics-server), "
                   + (f"sampled every {SAMPLE_INTERVAL} s for {minutes:g} min. " if minutes else "one sample. ")
                   + "Clusters read through az aks command invoke have one snapshot. A short window can miss peaks; "
-                  "Zoorik's own recommendations use a longer history."),
+                  "Coral's own recommendations use a longer history."),
         ("Prices", "Azure: the public Azure Retail Prices API, Linux pay-as-you-go, or the Spot meter for Spot "
                    "nodes. AWS: the AWS Price List API, Linux, shared tenancy, on-demand; Spot nodes use the current "
                    "Spot price averaged across zones. USD list prices, without discounts, reservations, savings "
@@ -1496,7 +1496,7 @@ def assumptions(minutes: float, anonymized: bool) -> list:
     if anonymized:
         rows.append(("Anonymized", "Namespace, workload and node names are replaced by short hashes salted for this "
                                    "run only, so they cannot be reversed."))
-    rows.append(("Prepared by", f"Zoorik Kubernetes assessment {VERSION}. Run it again: {ONE_LINER}  "
+    rows.append(("Prepared by", f"Zoorik Coral: Kubernetes assessment {VERSION}. Run it again: {ONE_LINER}  "
                                 f"Questions: {SEND_TO}"))
     return [list(r) for r in rows]
 
@@ -1670,7 +1670,7 @@ def write_xlsx(path: str, sheets: list) -> None:
 # ---------------------------------------------------------------- main
 
 def parse_args(argv: Optional[list]) -> argparse.Namespace:
-    p = argparse.ArgumentParser(prog="coral.py", usage=f"{ONE_LINER} [options]",
+    p = argparse.ArgumentParser(prog="k8s.py", usage=f"{ONE_LINER} [options]",
                                 description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--context", action="append", metavar="NAME", help="assess this kube context (repeatable)")
     p.add_argument("--all-contexts", action="store_true", help="assess every context in your kubeconfig")
@@ -1687,7 +1687,7 @@ def parse_args(argv: Optional[list]) -> argparse.Namespace:
     p.add_argument("--anonymize", action="store_true", help="replace namespace, workload and node names with hashes")
     p.add_argument("--anonymize-clusters", action="store_true", help="also replace cluster names (implies --anonymize)")
     p.add_argument("--out", metavar="PATH", help="output file or folder")
-    p.add_argument("--version", action="version", version=f"Zoorik Kubernetes assessment {VERSION}")
+    p.add_argument("--version", action="version", version=f"Zoorik Coral: Kubernetes assessment {VERSION}")
     args = p.parse_args(argv)
     if not math.isfinite(args.sample_minutes) or args.sample_minutes < 0:
         p.error("--sample-minutes must be a number, 0 or more")
@@ -1725,7 +1725,7 @@ def unexpected(e: Exception) -> str:
 
 
 def assess(args: argparse.Namespace) -> int:
-    say(f"Zoorik Kubernetes assessment {VERSION}. It sends nothing to Zoorik; you send the report yourself.")
+    say(f"Zoorik Coral: Kubernetes assessment {VERSION}. It sends nothing to Zoorik; you send the report yourself.")
     shell = "azure" if in_azure_cloud_shell() else "aws" if in_aws_cloudshell() else ""
     try:
         path = output_path(args.out, shell)
@@ -1775,7 +1775,7 @@ def assess(args: argparse.Namespace) -> int:
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     sheets = [
         Sheet("Summary", SUMMARY_COLS, rows, total=total,
-              preamble=[("Zoorik Kubernetes cost assessment", "title"), (f"Generated {generated}", ""),
+              preamble=[("Zoorik Coral: Kubernetes cost assessment", "title"), (f"Generated {generated}", ""),
                         (f"Script version {VERSION}", ""), ("", "")]),
         Sheet("Node pools", POOL_COLS, pool_rows(clusters, names)),
         Sheet("Nodes", NODE_COLS, node_rows(clusters, names)),
