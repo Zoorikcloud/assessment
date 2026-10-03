@@ -1,6 +1,6 @@
 # Zoorik assessments
 
-Zoorik's free assessments for k8spilot (Kubernetes) and ElasticVol (Azure block storage). You paste one line. The script writes one Excel file that estimates what you could save, and you e-mail that file to founders@zoorik.com.
+Zoorik's free assessments for Coral (Kubernetes) and Amoeba (Azure block storage). You paste one line. The script writes one Excel file that estimates what you could save, and you e-mail that file to founders@zoorik.com.
 
 - [Kubernetes: `k8s.py`](#kubernetes-k8spy) covers AKS, EKS, or any cluster kubectl can reach.
 - [Azure disks: `disks.py`](#azure-disks-diskspy) covers the data disks of your Azure Linux VMs.
@@ -285,7 +285,7 @@ The script estimates a saving for each Linux VM whose disk usage was read.
 1. **Used space** is the space used on the VM's data-disk mounts. Each mount is rounded up to a whole GB. A shared disk (one attached to several VMs) is never pooled; it stays as it is, and the totals count it once.
 2. **Pool size** = used + 20% of used (at least 50 GB), rounded up.
 3. **Disk type:** the pool goes on Premium SSD v2 where the VM's region and zone offer it, as Azure lists it for your subscription. A VM without a zone also needs a region where Microsoft supports nonzonal Premium SSD v2. Otherwise the pool goes on Premium SSD. Pool disks are locally redundant (LRS). Where today's disks are zone-redundant (ZRS), the VM's Reason says that part of the saving is that difference.
-4. **Layout, as ElasticVol plans it:**
+4. **Layout, as Amoeba plans it:**
    - The pool has 3 to 6 equal elastic disks. Pools of 512 GB and over also have 2 anchor disks.
    - On a VM with few free data-disk slots, the pool has 1 anchor and up to 3 elastics.
    - The pool is built beside today's disks, so it must fit the free slots, with one slot kept spare.
@@ -312,13 +312,13 @@ The script estimates a saving for each Linux VM whose disk usage was read.
 - scale-set (uniform) instances;
 - subscriptions in other directories.
 
-Data disks without a mounted file system stay as they are. Unattached disks are listed with their cost on their own sheet, outside the ElasticVol saving.
+Data disks without a mounted file system stay as they are. Unattached disks are listed with their cost on their own sheet, outside the Amoeba saving.
 
 **Lanes** (the Lane column on the VMs sheet):
 
 | Lane | Meaning |
 |---|---|
-| Ready | ElasticVol can take the VM as it is. |
+| Ready | Amoeba can take the VM as it is. |
 | Needs work | The VM needs a fix first: a kernel below 5.14, Azure Disk Encryption, or not enough free data-disk slots. |
 | Not supported | Windows; a VM in a resource group another Azure service manages, such as Azure Databricks or an AKS node resource group; fewer than 8 data-disk slots; RHEL-family Linux; no btrfs in the kernel; or no mounted data disk other than shared disks. |
 | Not checked | Disk usage was not read. |

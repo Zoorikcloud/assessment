@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Zoorik Kubernetes cost assessment.
+"""Zoorik Coral: Kubernetes cost assessment.
 
 Reads your AKS and EKS clusters, estimates what right-sizing could save, and
 writes one Excel file for you to e-mail to Zoorik. Nothing to install.
@@ -1471,7 +1471,7 @@ def assumptions(minutes: float, anonymized: bool) -> list:
         ("Usage", "Peak of kubectl top (metrics-server), "
                   + (f"sampled every {SAMPLE_INTERVAL} s for {minutes:g} min. " if minutes else "one sample. ")
                   + "Clusters read through az aks command invoke have one snapshot. A short window can miss peaks; "
-                  "Zoorik's own recommendations use a longer history."),
+                  "Coral's own recommendations use a longer history."),
         ("Prices", "Azure: the public Azure Retail Prices API, Linux pay-as-you-go, or the Spot meter for Spot "
                    "nodes. AWS: the AWS Price List API, Linux, shared tenancy, on-demand; Spot nodes use the current "
                    "Spot price averaged across zones. USD list prices, without discounts, reservations, savings "
@@ -1496,7 +1496,7 @@ def assumptions(minutes: float, anonymized: bool) -> list:
     if anonymized:
         rows.append(("Anonymized", "Namespace, workload and node names are replaced by short hashes salted for this "
                                    "run only, so they cannot be reversed."))
-    rows.append(("Prepared by", f"Zoorik Kubernetes assessment {VERSION}. Run it again: {ONE_LINER}  "
+    rows.append(("Prepared by", f"Zoorik Coral: Kubernetes assessment {VERSION}. Run it again: {ONE_LINER}  "
                                 f"Questions: {SEND_TO}"))
     return [list(r) for r in rows]
 
@@ -1687,7 +1687,7 @@ def parse_args(argv: Optional[list]) -> argparse.Namespace:
     p.add_argument("--anonymize", action="store_true", help="replace namespace, workload and node names with hashes")
     p.add_argument("--anonymize-clusters", action="store_true", help="also replace cluster names (implies --anonymize)")
     p.add_argument("--out", metavar="PATH", help="output file or folder")
-    p.add_argument("--version", action="version", version=f"Zoorik Kubernetes assessment {VERSION}")
+    p.add_argument("--version", action="version", version=f"Zoorik Coral: Kubernetes assessment {VERSION}")
     args = p.parse_args(argv)
     if not math.isfinite(args.sample_minutes) or args.sample_minutes < 0:
         p.error("--sample-minutes must be a number, 0 or more")
@@ -1725,7 +1725,7 @@ def unexpected(e: Exception) -> str:
 
 
 def assess(args: argparse.Namespace) -> int:
-    say(f"Zoorik Kubernetes assessment {VERSION}. It sends nothing to Zoorik; you send the report yourself.")
+    say(f"Zoorik Coral: Kubernetes assessment {VERSION}. It sends nothing to Zoorik; you send the report yourself.")
     shell = "azure" if in_azure_cloud_shell() else "aws" if in_aws_cloudshell() else ""
     try:
         path = output_path(args.out, shell)
@@ -1775,7 +1775,7 @@ def assess(args: argparse.Namespace) -> int:
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     sheets = [
         Sheet("Summary", SUMMARY_COLS, rows, total=total,
-              preamble=[("Zoorik Kubernetes cost assessment", "title"), (f"Generated {generated}", ""),
+              preamble=[("Zoorik Coral: Kubernetes cost assessment", "title"), (f"Generated {generated}", ""),
                         (f"Script version {VERSION}", ""), ("", "")]),
         Sheet("Node pools", POOL_COLS, pool_rows(clusters, names)),
         Sheet("Nodes", NODE_COLS, node_rows(clusters, names)),
