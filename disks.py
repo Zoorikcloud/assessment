@@ -7,7 +7,7 @@ your Linux VMs, and writes one Excel file for you to e-mail to Zoorik.
 Nothing to install.
 
 Run it in Azure Cloud Shell, or in any shell where az is signed in:
-    curl -fsSL https://zoorik.com/assess/amoeba | python3 -
+    curl -fsSL https://zoorik.com/assess/disks | python3 -
 
 The source is at github.com/Zoorikcloud/assessment.
 
@@ -56,7 +56,7 @@ from xml.sax.saxutils import escape
 # ---------------------------------------------------------------- config
 
 VERSION = "1.0.0"
-ONE_LINER = "curl -fsSL https://zoorik.com/assess/amoeba | python3 -"
+ONE_LINER = "curl -fsSL https://zoorik.com/assess/disks | python3 -"
 SEND_TO = "founders@zoorik.com"
 
 HOURS_PER_MONTH = 730
