@@ -9,7 +9,7 @@ Nothing to install.
 Run it in Azure Cloud Shell, or in any shell where az is signed in:
     curl -fsSL https://zoorik.com/assess/disks | python3 -
 
-The source is at github.com/Zoorikcloud/assessment.
+The source is at github.com/getzoorik/assessment.
 
 What it does. Apart from the one step marked below, which runs only if you
 answer y, it only reads, and it sends nothing anywhere.
