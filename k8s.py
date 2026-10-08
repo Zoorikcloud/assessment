@@ -14,7 +14,7 @@ Options go after the dash. --context NAME assesses only that context:
     curl -fsSL https://zoorik.com/assess/k8s | python3 - --anonymize
     curl -fsSL https://zoorik.com/assess/k8s | python3 - --context prod --sample-minutes 10
 
-The source is at github.com/Zoorikcloud/assessment.
+The source is at github.com/getzoorik/assessment.
 
 What it does:
   - It reads. In each cluster it runs only kubectl get and kubectl top. With
@@ -88,7 +88,7 @@ INVOKE_TIMEOUT = 900
 
 MIB = 2**20
 GIB = 2**30
-DOCS = "see github.com/Zoorikcloud/assessment#access-it-needs"
+DOCS = "see github.com/getzoorik/assessment#access-it-needs"
 UNREACHABLE = "API server not reachable from here"
 PRIVATE = "private API not reachable from here"
 NETWORK = {"aks": "VNet", "eks": "VPC"}
